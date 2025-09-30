@@ -17,6 +17,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 
 // Components
 import { HeaderComponent } from './core/components/header/header.component';
@@ -31,6 +37,7 @@ import { TransactionService } from './core/services/transaction.service';
 import { CategoryService } from './core/services/category.service';
 import { ThemeService } from './core/services/theme.service';
 import { BudgetService } from './core/services/budget.service';
+import { ReportService } from './core/services/report.service';
 import { GoalService } from './core/services/goal.service';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { AuthGuard } from './core/guards/auth.guard';
@@ -57,7 +64,13 @@ import { AuthGuard } from './core/guards/auth.guard';
     MatDividerModule,     // ← Para o divider no menu
     MatMenuModule,        // ← Para menus dropdown
     MatSnackBarModule,     // ← Para notificações
-    MatTooltipModule
+    MatTooltipModule,
+    MatCardModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatSelectModule
   ],
   providers: [
     AuthService,
@@ -68,6 +81,7 @@ import { AuthGuard } from './core/guards/auth.guard';
     CategoryService,
     ThemeService,
     BudgetService,
+    ReportService,
     GoalService,
     AuthGuard,
     {

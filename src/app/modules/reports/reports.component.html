@@ -1,0 +1,49 @@
+<mat-card class="filters-card">
+  <form [formGroup]="filterForm" (ngSubmit)="applyFilters()">
+    <div class="filters-row">
+      <mat-form-field appearance="outline">
+        <mat-label>Início</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="start">
+        <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Fim</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="end">
+        <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Categoria</mat-label>
+        <mat-select formControlName="category">
+          <mat-option value="">Todas</mat-option>
+          <!-- preencher com categorias via API se quiser -->
+        </mat-select>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit">Aplicar</button>
+    </div>
+  </form>
+</mat-card>
+
+<div class="charts-grid">
+  <mat-card>
+    <mat-card-title>Gastos por Categoria</mat-card-title>
+    <mat-card-content style="height:320px">
+      <canvas baseChart
+              [data]="doughnutData"
+              chartType="doughnut"
+              [options]="{ responsive: true }"></canvas>
+    </mat-card-content>
+  </mat-card>
+
+  <mat-card>
+    <mat-card-title>Transações</mat-card-title>
+    <mat-card-content>
+      <!-- Reutilize seu componente data-table -->
+      <app-data-table [data]="transactions"></app-data-table>
+    </mat-card-content>
+  </mat-card>
+</div>

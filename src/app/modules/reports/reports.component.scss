@@ -1,0 +1,12 @@
+.filters-row {
+  display:flex;
+  gap:12px;
+  align-items: center;
+  flex-wrap:wrap;
+}
+.charts-grid {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
