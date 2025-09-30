@@ -7,7 +7,7 @@
 
 ## 📋 Sobre o Projeto
 
-O **FinMind** é uma aplicação web moderna para gestão financeira pessoal, desenvolvida com Angular 16 e TypeScript. A plataforma permite que usuários controlem suas finanças de forma intuitiva e eficiente, com dashboards interativos, relatórios detalhados e ferramentas de análise.
+O **FinMind** é uma aplicação web moderna para gestão financeira pessoal, desenvolvida com Angular 15 e TypeScript. A plataforma permite que usuários controlem suas finanças de forma intuitiva e eficiente, com dashboards interativos, relatórios detalhados e ferramentas de análise.
 
 ### 🎯 Funcionalidades Principais
 
