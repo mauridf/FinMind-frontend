@@ -1,0 +1,54 @@
+.transaction-form-container {
+  min-width: 400px;
+  
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 0;
+    
+    mat-icon {
+      color: #1976d2;
+    }
+  }
+}
+
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  
+  &.full-width {
+    width: 100%;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: calc(50% - 8px);
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .transaction-form-container {
+    min-width: auto;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .half-width {
+    width: 100%;
+  }
+}

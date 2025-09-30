@@ -1,0 +1,104 @@
+<div class="transactions-container">
+  <div class="transactions-header">
+    <h1>Transações</h1>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onAddTransaction()">
+      <mat-icon>add</mat-icon>
+      Nova Transação
+    </button>
+  </div>
+
+  <!-- Filtros -->
+  <mat-card class="filters-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>filter_list</mat-icon>
+        Filtros
+      </mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="filters-row">
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Tipo</mat-label>
+          <mat-select [(value)]="filterType" (selectionChange)="applyFilters()">
+            <mat-option [value]="null">Todos</mat-option>
+            <mat-option [value]="1">Receita</mat-option>
+            <mat-option [value]="2">Despesa</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Categoria</mat-label>
+          <mat-select [(value)]="filterCategory" (selectionChange)="applyFilters()">
+            <mat-option [value]="''">Todas</mat-option>
+            <mat-option *ngFor="let category of categories" [value]="category">
+              {{ category }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Data Inicial</mat-label>
+          <input 
+            matInput 
+            [matDatepicker]="startPicker" 
+            [value]="startDate"
+            (dateChange)="onStartDateChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Data Final</mat-label>
+          <input 
+            matInput 
+            [matDatepicker]="endPicker" 
+            [value]="endDate"
+            (dateChange)="onEndDateChange($event)">
+          <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="filter-actions">
+        <button 
+          mat-button 
+          color="primary" 
+          (click)="applyFilters()"
+          [disabled]="loading">
+          <mat-icon>search</mat-icon>
+          Aplicar Filtros
+        </button>
+        
+        <button 
+          mat-button 
+          color="warn" 
+          (click)="clearFilters()"
+          [disabled]="loading">
+          <mat-icon>clear</mat-icon>
+          Limpar Filtros
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Tabela de Transações -->
+  <mat-card class="transactions-card">
+    <mat-card-content>
+      <app-data-table
+        [data]="paginatedTransactions"
+        [columns]="columns"
+        [totalItems]="totalItems"
+        [pageSize]="pageSize"
+        [loading]="loading"
+        (pageChange)="onPageChange($event)"
+        (edit)="onEditTransaction($event)"
+        (delete)="onDeleteTransaction($event)"
+        (view)="onViewTransaction($event)">
+      </app-data-table>
+    </mat-card-content>
+  </mat-card>
+</div>

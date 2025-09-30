@@ -12,7 +12,7 @@ export class SidenavComponent {
 
   menuItems = [
     { path: '/dashboard', icon: 'dashboard', label: 'Dashboard' },
-    { path: '/transactions', icon: 'receipt', label: 'Transações' },
+    { path: '/transaction', icon: 'receipt', label: 'Transações' },
     { path: '/categories', icon: 'category', label: 'Categorias' },
     { path: '/budgets', icon: 'savings', label: 'Orçamentos' },
     { path: '/goals', icon: 'flag', label: 'Metas' },

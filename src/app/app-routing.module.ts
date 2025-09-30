@@ -11,7 +11,12 @@ const routes: Routes = [
   { 
     path: 'dashboard', 
     loadChildren: () => import('./modules/dashboard/dashboard.module').then(m => m.DashboardModule),
-    canActivate: [AuthGuard] // ← Adicionar AuthGuard aqui
+    canActivate: [AuthGuard]
+  },
+  { 
+    path: 'transaction', 
+    loadChildren: () => import('./modules/transaction/transactions.module').then(m => m.TransactionsModule),
+    canActivate: [AuthGuard]
   },
   { path: '**', redirectTo: '/auth' }
 ];
