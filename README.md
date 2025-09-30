@@ -1,27 +1,133 @@
-# FinMindFrontend
+# FinMind - Sistema de Gestão Financeira Pessoal
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 15.2.11.
+![FinMind](https://img.shields.io/badge/FinMind-Personal%20Finance%20Manager-blue)
+![Angular](https://img.shields.io/badge/Angular-15-DD0031?logo=angular)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?logo=typescript)
+![.NET 9](https://img.shields.io/badge/.NET-9-339933?logo=dotnet)
 
-## Development server
+## 📋 Sobre o Projeto
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+O **FinMind** é uma aplicação web moderna para gestão financeira pessoal, desenvolvida com Angular 16 e TypeScript. A plataforma permite que usuários controlem suas finanças de forma intuitiva e eficiente, com dashboards interativos, relatórios detalhados e ferramentas de análise.
 
-## Code scaffolding
+### 🎯 Funcionalidades Principais
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+- **📊 Dashboard Interativo**: Visualização em tempo real do saldo, receitas e despesas
+- **💳 Gestão de Transações**: Registro e categorização de entradas e saídas
+- **📈 Relatórios Avançados**: Gráficos e análises detalhadas do comportamento financeiro
+- **🎯 Metas Financeiras**: Definição e acompanhamento de objetivos
+- **💰 Orçamentos**: Controle de limites de gastos por categoria
+- **🌙 Tema Escuro/Claro**: Interface adaptável às preferências do usuário
+- **📱 Design Responsivo**: Experiência otimizada para todos os dispositivos
 
-## Build
+## 🛠️ Tecnologias Utilizadas
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+### Frontend
+- **Angular 15** - Framework principal
+- **TypeScript** - Linguagem de programação
+- **Angular Material** - Componentes de UI
+- **Chart.js** - Gráficos e visualizações
+- **RxJS** - Programação reativa
+- **Flex Layout** - Layout responsivo
 
-## Running unit tests
+### [Backend](https://github.com/mauridf/FinMind)
+- **.NET 9** - Ambiente de execução
+- **JWT** - Autenticação
+- **MongoDB** - Banco de dados
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+## 🚀 Como Executar o Projeto
 
-## Running end-to-end tests
+### Pré-requisitos
+- .NET
+- Angular CLI 15+
+- MongoDB
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+### Instalação
 
-## Further help
+1. **Clone o repositório**
+```bash
+git clone https://github.com/mauridf/FinMind-frontend.git
+cd FinMind-frontend
+```
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+2. **Instale as dependências do frontend**
+```bash
+cd frontend
+npm install
+```
+
+3. **Execute a aplicação**
+```bash
+# Desenvolvimento
+ng serve
+```
+
+### Backend
+
+1. O passo a passo da execução do [Backend](https://github.com/mauridf/FinMind) se encontra no repositório dele próprio.
+
+## 📁 Estrutura do Projeto
+
+```
+finmind/
+├── frontend/                 # Aplicação Angular
+│   ├── src/
+│   │   ├── app/
+│   │   │   ├── core/         # Serviços, guards, interceptors
+│   │   │   ├── pages/        # Componentes de página
+│   │   │   ├── shared/       # Componentes compartilhados
+│   │   │   └── modules/      # Módulos de funcionalidade
+│   │   └── environments/    # Configurações por ambiente
+│   └── angular.json         # Configuração do Angular
+└── README.md
+```
+
+## 🎨 Componentes Principais
+
+### Dashboard
+- Visão geral financeira
+- Cards de saldo, receitas e despesas
+- Gráfico de evolução mensal
+- Últimas transações
+
+### Relatórios
+- **Gráfico de Pizza**: Distribuição de gastos por categoria
+- **Filtros Avançados**: Período e categorias específicas
+- **Tabela de Transações**: Listagem detalhada
+- **Exportação de Dados
+
+### Gestão de Transações
+- Formulário de cadastro
+- Categorização automática
+- Edição em lote
+- Busca e filtros
+
+## 🔧 Desenvolvimento
+
+### Convenções de Código
+
+- **TypeScript**: Tipagem forte e interfaces bem definidas
+- **Components**: OnPush change detection quando possível
+- **Services**: Injeção de dependências e observables
+- **Templates**: Angular Material e diretivas reativas
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/AmazingFeature`)
+3. Commit suas mudanças (`git commit -m 'Add some AmazingFeature'`)
+4. Push para a branch (`git push origin feature/AmazingFeature`)
+5. Abra um Pull Request
+
+## 👥 Autor
+
+- Maurício Oliveira - [mauridf](https://github.com/mauridf)
+
+## 🙏 Agradecimentos
+
+- Equipe Angular
+- Comunidade Angular Material
+- Contribuidores do Chart.js
+
+---
+
+**FinMind** - Transformando sua relação com o dinheiro 💰✨
