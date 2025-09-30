@@ -1,0 +1,398 @@
+<div class="goals-container">
+  <!-- Header -->
+  <div class="goals-header">
+    <div class="header-content">
+      <h1>Metas Financeiras</h1>
+      <p>Acompanhe e gerencie seus objetivos financeiros</p>
+    </div>
+    <div class="header-actions">
+      <button 
+        mat-stroked-button 
+        color="primary" 
+        (click)="refreshData()"
+        class="refresh-button">
+        <mat-icon>refresh</mat-icon>
+        Atualizar
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onAddGoal()">
+        <mat-icon>add</mat-icon>
+        Nova Meta
+      </button>
+    </div>
+  </div>
+
+  <!-- Estatísticas Rápidas -->
+  <div class="stats-grid" *ngIf="!loading && goals.length > 0">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">flag</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ totalGoalsCount }}</span>
+            <span class="stat-label">Total de Metas</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">play_arrow</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ activeGoalsCount }}</span>
+            <span class="stat-label">Metas Ativas</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">check_circle</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ completedGoalsCount }}</span>
+            <span class="stat-label">Metas Concluídas</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">warning</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ nearDueDateCount }}</span>
+            <span class="stat-label">Próximas do Prazo</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <mat-card class="goals-card">
+    <mat-card-content>
+      <mat-tab-group [(selectedIndex)]="selectedTab">
+        <!-- Todas as Metas -->
+        <mat-tab label="Todas as Metas">
+          <app-data-table
+            [data]="goals"
+            [columns]="columns"
+            [totalItems]="goals.length"
+            [pageSize]="10"
+            [loading]="loading"
+            [showActions]="true"
+            (edit)="onEditGoal($event)"
+            (delete)="onDeleteGoal($event)"
+            (view)="onViewGoal($event)">
+            
+            <!-- Template customizado para tipo -->
+            <ng-container *appDataTableCustomCell="let item; column: 'type'">
+              <mat-chip 
+                [style.background]="getGoalTypeColor(item.type)"
+                color="primary"
+                selected
+                class="type-chip">
+                <mat-icon>{{ getGoalTypeIcon(item.type) }}</mat-icon>
+                {{ getGoalTypeLabel(item.type) }}
+              </mat-chip>
+            </ng-container>
+
+            <!-- Template customizado para progresso -->
+            <ng-container *appDataTableCustomCell="let item; column: 'progress'">
+              <div class="progress-container">
+                <div class="progress-info">
+                  <span class="progress-amount">
+                    {{ formatCurrency(item.currentAmount) }} / {{ formatCurrency(item.targetAmount) }}
+                  </span>
+                  <span class="progress-percentage">
+                    {{ formatPercentage(item.progress) }}
+                  </span>
+                </div>
+                <mat-progress-bar 
+                  [value]="item.progress" 
+                  [color]="getProgressColor(item.progress)"
+                  mode="determinate"
+                  class="progress-bar">
+                </mat-progress-bar>
+              </div>
+            </ng-container>
+
+            <!-- Template customizado para prioridade -->
+            <ng-container *appDataTableCustomCell="let item; column: 'priority'">
+              <mat-chip 
+                [color]="getPriorityColor(item.priority)" 
+                selected
+                class="priority-chip">
+                <mat-icon>{{ getPriorityIcon(item.priority) }}</mat-icon>
+                {{ getPriorityLabel(item.priority) }}
+              </mat-chip>
+            </ng-container>
+
+            <!-- Template customizado para status -->
+            <ng-container *appDataTableCustomCell="let item; column: 'status'">
+              <mat-chip 
+                [color]="getStatusColor(item)" 
+                selected
+                class="status-chip">
+                {{ getStatusText(item) }}
+              </mat-chip>
+            </ng-container>
+
+            <!-- Template customizado para ações -->
+            <ng-container *appDataTableCustomCell="let item; column: 'actions'">
+              <button 
+                mat-icon-button 
+                color="primary" 
+                (click)="onViewGoal(item)"
+                matTooltip="Visualizar">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              
+              <!-- Menu de ações para metas ativas -->
+              <button 
+                *ngIf="!item.isCompleted"
+                mat-icon-button 
+                [matMenuTriggerFor]="actionMenu"
+                color="accent"
+                matTooltip="Mais ações">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              
+              <mat-menu #actionMenu="matMenu">
+                <button 
+                  mat-menu-item 
+                  (click)="onUpdateProgress(item)">
+                  <mat-icon>update</mat-icon>
+                  <span>Atualizar Progresso</span>
+                </button>
+                <button 
+                  mat-menu-item 
+                  (click)="onCompleteGoal(item)">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Marcar como Concluída</span>
+                </button>
+                <button 
+                  mat-menu-item 
+                  (click)="onEditGoal(item)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar Meta</span>
+                </button>
+              </mat-menu>
+
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="onDeleteGoal(item)"
+                matTooltip="Excluir">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ng-container>
+          </app-data-table>
+        </mat-tab>
+
+        <!-- Metas Ativas -->
+        <mat-tab label="Metas Ativas">
+          <app-data-table
+            [data]="activeGoals"
+            [columns]="columns"
+            [totalItems]="activeGoals.length"
+            [pageSize]="10"
+            [loading]="loading"
+            [showActions]="true"
+            (edit)="onEditGoal($event)"
+            (delete)="onDeleteGoal($event)"
+            (view)="onViewGoal($event)">
+            
+            <!-- Mesmos templates customizados da aba anterior -->
+            <ng-container *appDataTableCustomCell="let item; column: 'type'">
+              <mat-chip 
+                [style.background]="getGoalTypeColor(item.type)"
+                color="primary"
+                selected
+                class="type-chip">
+                <mat-icon>{{ getGoalTypeIcon(item.type) }}</mat-icon>
+                {{ getGoalTypeLabel(item.type) }}
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'progress'">
+              <div class="progress-container">
+                <div class="progress-info">
+                  <span class="progress-amount">
+                    {{ formatCurrency(item.currentAmount) }} / {{ formatCurrency(item.targetAmount) }}
+                  </span>
+                  <span class="progress-percentage">
+                    {{ formatPercentage(item.progress) }}
+                  </span>
+                </div>
+                <mat-progress-bar 
+                  [value]="item.progress" 
+                  [color]="getProgressColor(item.progress)"
+                  mode="determinate"
+                  class="progress-bar">
+                </mat-progress-bar>
+              </div>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'priority'">
+              <mat-chip 
+                [color]="getPriorityColor(item.priority)" 
+                selected
+                class="priority-chip">
+                <mat-icon>{{ getPriorityIcon(item.priority) }}</mat-icon>
+                {{ getPriorityLabel(item.priority) }}
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'status'">
+              <mat-chip 
+                [color]="getStatusColor(item)" 
+                selected
+                class="status-chip">
+                {{ getStatusText(item) }}
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'actions'">
+              <button 
+                mat-icon-button 
+                color="primary" 
+                (click)="onViewGoal(item)"
+                matTooltip="Visualizar">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              
+              <button 
+                mat-icon-button 
+                [matMenuTriggerFor]="actionMenu"
+                color="accent"
+                matTooltip="Mais ações">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              
+              <mat-menu #actionMenu="matMenu">
+                <button 
+                  mat-menu-item 
+                  (click)="onUpdateProgress(item)">
+                  <mat-icon>update</mat-icon>
+                  <span>Atualizar Progresso</span>
+                </button>
+                <button 
+                  mat-menu-item 
+                  (click)="onCompleteGoal(item)">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Marcar como Concluída</span>
+                </button>
+                <button 
+                  mat-menu-item 
+                  (click)="onEditGoal(item)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar Meta</span>
+                </button>
+              </mat-menu>
+
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="onDeleteGoal(item)"
+                matTooltip="Excluir">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ng-container>
+          </app-data-table>
+        </mat-tab>
+
+        <!-- Metas Concluídas -->
+        <mat-tab label="Metas Concluídas">
+          <app-data-table
+            [data]="completedGoals"
+            [columns]="columns"
+            [totalItems]="completedGoals.length"
+            [pageSize]="10"
+            [loading]="loading"
+            [showActions]="true"
+            (edit)="onEditGoal($event)"
+            (delete)="onDeleteGoal($event)"
+            (view)="onViewGoal($event)">
+            
+            <!-- Templates simplificados para metas concluídas -->
+            <ng-container *appDataTableCustomCell="let item; column: 'type'">
+              <mat-chip 
+                [style.background]="getGoalTypeColor(item.type)"
+                color="primary"
+                selected
+                class="type-chip">
+                <mat-icon>{{ getGoalTypeIcon(item.type) }}</mat-icon>
+                {{ getGoalTypeLabel(item.type) }}
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'progress'">
+              <div class="progress-container completed">
+                <div class="progress-info">
+                  <span class="progress-amount">
+                    {{ formatCurrency(item.targetAmount) }}
+                  </span>
+                  <span class="progress-percentage success">
+                    <mat-icon>check_circle</mat-icon>
+                    Concluída
+                  </span>
+                </div>
+                <mat-progress-bar 
+                  value="100" 
+                  color="primary"
+                  mode="determinate"
+                  class="progress-bar">
+                </mat-progress-bar>
+              </div>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'priority'">
+              <mat-chip 
+                [color]="getPriorityColor(item.priority)" 
+                selected
+                class="priority-chip">
+                <mat-icon>{{ getPriorityIcon(item.priority) }}</mat-icon>
+                {{ getPriorityLabel(item.priority) }}
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'status'">
+              <mat-chip 
+                color="primary" 
+                selected
+                class="status-chip">
+                <mat-icon>check_circle</mat-icon>
+                Concluída
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'actions'">
+              <button 
+                mat-icon-button 
+                color="primary" 
+                (click)="onViewGoal(item)"
+                matTooltip="Visualizar">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="onDeleteGoal(item)"
+                matTooltip="Excluir">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ng-container>
+          </app-data-table>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,144 @@
+<div class="goal-form-container">
+  <h2 mat-dialog-title>
+    <mat-icon>{{ isEdit ? 'edit' : 'add' }}</mat-icon>
+    {{ isEdit ? 'Editar Meta' : 'Nova Meta' }}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="goalForm" class="goal-form">
+      <!-- Nome da Meta -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome da Meta</mat-label>
+          <input matInput formControlName="name" maxlength="100" placeholder="Ex: Viagem para Europa">
+          <mat-hint align="end">{{ goalForm.get('name')?.value?.length || 0 }}/100</mat-hint>
+          <mat-error *ngIf="goalForm.get('name')?.hasError('required')">
+            Nome da meta é obrigatório
+          </mat-error>
+          <mat-error *ngIf="goalForm.get('name')?.hasError('minlength')">
+            Nome deve ter pelo menos 3 caracteres
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Valor e Data -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Valor da Meta</mat-label>
+          <input 
+            matInput 
+            type="number" 
+            formControlName="targetAmount" 
+            min="0.01" 
+            step="0.01"
+            placeholder="0,00">
+          <span matPrefix>R$&nbsp;</span>
+          <mat-error *ngIf="goalForm.get('targetAmount')?.hasError('required')">
+            Valor é obrigatório
+          </mat-error>
+          <mat-error *ngIf="goalForm.get('targetAmount')?.hasError('min')">
+            Valor deve ser maior que zero
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Data Alvo</mat-label>
+          <input 
+            matInput 
+            [matDatepicker]="targetPicker" 
+            formControlName="targetDate"
+            [min]="minDate">
+          <mat-datepicker-toggle matSuffix [for]="targetPicker"></mat-datepicker-toggle>
+          <mat-datepicker #targetPicker></mat-datepicker>
+          <mat-error *ngIf="goalForm.get('targetDate')?.hasError('required')">
+            Data alvo é obrigatória
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Tipo e Prioridade -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Tipo de Meta</mat-label>
+          <mat-select formControlName="type">
+            <mat-option *ngFor="let type of goalTypes" [value]="type.value">
+              <div class="type-option">
+                <mat-icon [style.color]="type.color">{{ type.icon }}</mat-icon>
+                <span>{{ type.label }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="goalForm.get('type')?.hasError('required')">
+            Tipo é obrigatório
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Prioridade</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option *ngFor="let priority of priorityLevels" [value]="priority.value">
+              <div class="priority-option">
+                <mat-icon [style.color]="priority.color">{{ priority.icon }}</mat-icon>
+                <span>{{ priority.label }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="goalForm.get('priority')?.hasError('required')">
+            Prioridade é obrigatória
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Resumo -->
+    <div class="summary-section" *ngIf="goalForm.valid">
+    <h3>Resumo da Meta</h3>
+    <div class="summary-card">
+        <div class="summary-item">
+        <span class="label">Meta:</span>
+        <span class="value">{{ goalForm.get('name')?.value }}</span>
+        </div>
+        <div class="summary-item">
+        <span class="label">Valor:</span>
+        <span class="value">{{ goalForm.get('targetAmount')?.value | currency:'BRL' }}</span>
+        </div>
+        <div class="summary-item">
+        <span class="label">Prazo:</span>
+        <span class="value">{{ goalForm.get('targetDate')?.value | date:'dd/MM/yyyy' }}</span>
+        </div>
+        <div class="summary-item">
+        <span class="label">Tipo:</span>
+        <span class="value">
+            <mat-icon [style.color]="getGoalTypeColor(goalForm.get('type')?.value)">
+            {{ getGoalTypeIcon(goalForm.get('type')?.value) }}
+            </mat-icon>
+            {{ getGoalTypeLabel(goalForm.get('type')?.value) }}
+        </span>
+        </div>
+        <div class="summary-item">
+        <span class="label">Prioridade:</span>
+        <span class="value">
+            <mat-icon [style.color]="getPriorityColor(goalForm.get('priority')?.value)">
+            {{ getPriorityIcon(goalForm.get('priority')?.value) }}
+            </mat-icon>
+            {{ getPriorityLabel(goalForm.get('priority')?.value) }}
+        </span>
+        </div>
+    </div>
+    </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="loading">
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()"
+      [disabled]="goalForm.invalid || loading">
+      <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+      <span *ngIf="!loading">{{ isEdit ? 'Atualizar' : 'Criar' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

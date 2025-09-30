@@ -1,0 +1,66 @@
+<div class="progress-dialog-container">
+  <h2 mat-dialog-title>
+    <mat-icon>update</mat-icon>
+    Atualizar Progresso
+  </h2>
+
+  <mat-dialog-content>
+    <div class="goal-info">
+      <h3>{{ data.goal.name }}</h3>
+      <p>Meta: {{ formatCurrency(data.goal.targetAmount) }}</p>
+      <p>Progresso atual: {{ formatCurrency(data.goal.currentAmount) }} ({{ data.goal.progress.toFixed(1) }}%)</p>
+    </div>
+
+    <form [formGroup]="progressForm" class="progress-form">
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Novo Valor do Progresso</mat-label>
+        <input 
+          matInput 
+          type="number" 
+          formControlName="amount" 
+          [min]="0" 
+          [max]="getMaxAmount()"
+          step="0.01"
+          placeholder="0,00">
+        <span matPrefix>R$&nbsp;</span>
+        <mat-hint>Máximo: {{ formatCurrency(getMaxAmount()) }}</mat-hint>
+        <mat-error *ngIf="progressForm.get('amount')?.hasError('required')">
+          Valor é obrigatório
+        </mat-error>
+        <mat-error *ngIf="progressForm.get('amount')?.hasError('min')">
+          Valor não pode ser negativo
+        </mat-error>
+      </mat-form-field>
+    </form>
+
+    <div class="progress-preview" *ngIf="progressForm.valid">
+      <h4>Novo Progresso:</h4>
+      <div class="preview-info">
+        <span>{{ formatCurrency(progressForm.get('amount')?.value) }} / {{ formatCurrency(data.goal.targetAmount) }}</span>
+        <span class="preview-percentage">
+          {{ ((progressForm.get('amount')?.value / data.goal.targetAmount) * 100).toFixed(1) }}%
+        </span>
+      </div>
+      <mat-progress-bar 
+        [value]="(progressForm.get('amount')?.value / data.goal.targetAmount) * 100" 
+        color="primary"
+        mode="determinate"
+        class="preview-progress">
+      </mat-progress-bar>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="loading">
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()"
+      [disabled]="progressForm.invalid || loading">
+      <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+      <span *ngIf="!loading">Atualizar</span>
+    </button>
+  </mat-dialog-actions>
+</div>
