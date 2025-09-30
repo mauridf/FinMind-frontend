@@ -1,0 +1,93 @@
+.sidenav-container {
+  width: 280px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(180deg, #2c3e50 0%, #3498db 100%);
+  color: white;
+}
+
+.sidenav-header {
+  padding: 24px 16px;
+  background: rgba(0, 0, 0, 0.1);
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    
+    .user-avatar {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: rgba(255, 255, 255, 0.9);
+    }
+    
+    .user-details {
+      display: flex;
+      flex-direction: column;
+      
+      .user-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+      }
+      
+      .user-role {
+        font-size: 0.8rem;
+        opacity: 0.8;
+      }
+    }
+  }
+}
+
+// Estilo para os itens da lista
+mat-nav-list {
+  padding: 0;
+  
+  .nav-item {
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    border-left: 4px solid transparent;
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      color: white;
+      border-left-color: #3498db;
+    }
+  }
+}
+
+.nav-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.sidenav-footer {
+  margin-top: auto;
+  
+  .logout-item {
+    color: rgba(255, 255, 255, 0.8);
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(231, 76, 60, 0.2);
+      color: #e74c3c;
+    }
+  }
+}
+
+// Garantir que o texto não fique cortado
+.mat-list-item {
+  height: 48px !important;
+  
+  .mat-list-item-content {
+    padding: 0 16px !important;
+  }
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .sidenav-container {
+    width: 250px;
+  }
+}

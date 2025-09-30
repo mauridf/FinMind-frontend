@@ -1,0 +1,27 @@
+<!-- Layout para usuários não autenticados -->
+<div *ngIf="!isLoggedIn" class="auth-layout">
+  <router-outlet></router-outlet>
+</div>
+
+<!-- Layout para usuários autenticados -->
+<div *ngIf="isLoggedIn" class="main-layout">
+  <app-header (toggleSidenav)="toggleSidenav()"></app-header>
+  
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav 
+      #sidenav
+      [(opened)]="showSidenav"
+      mode="over"
+      position="start"
+      (closed)="closeSidenav()"
+      class="app-sidenav">
+      <app-sidenav (closeSidenav)="closeSidenav()"></app-sidenav>
+    </mat-sidenav>
+
+    <mat-sidenav-content class="main-content">
+      <div class="content-wrapper">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

@@ -1,0 +1,41 @@
+<mat-toolbar color="primary" class="header-toolbar">
+  <button mat-icon-button (click)="toggleSidenav.emit()" class="menu-button">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <div class="header-title">
+    <span class="title-text">FinMind</span>
+    <span class="subtitle-text">Gestão Financeira</span>
+  </div>
+
+  <span class="spacer"></span>
+
+  <div class="user-menu-container">
+    <button 
+      mat-icon-button 
+      class="user-button"
+      (click)="toggleUserMenu()"
+      [class.active]="showUserMenu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    
+    <div class="user-menu" *ngIf="showUserMenu" (click)="$event.stopPropagation()">
+      <div class="user-info">
+        <mat-icon class="user-icon">person</mat-icon>
+        <div class="user-details">
+          <strong>{{ currentUser?.name || 'Usuário' }}</strong>
+          <small>{{ currentUser?.email }}</small>
+        </div>
+      </div>
+      
+      <mat-divider></mat-divider>
+      
+      <button mat-menu-item (click)="onLogout()" class="logout-button">
+        <mat-icon>logout</mat-icon>
+        <span>Sair</span>
+      </button>
+    </div>
+  </div>
+</mat-toolbar>
+
+<div class="menu-backdrop" *ngIf="showUserMenu" (click)="showUserMenu = false"></div>

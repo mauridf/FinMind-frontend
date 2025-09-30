@@ -1,0 +1,30 @@
+<nav class="sidenav-container">
+  <div class="sidenav-header">
+    <div class="user-info">
+      <mat-icon class="user-avatar">account_balance</mat-icon>
+      <div class="user-details">
+        <span class="user-name">FinMind</span>
+        <span class="user-role">Sistema Financeiro</span>
+      </div>
+    </div>
+  </div>
+
+  <mat-nav-list>
+    <a 
+      mat-list-item 
+      *ngFor="let item of menuItems"
+      (click)="onNavigate(item.path)"
+      class="nav-item">
+      <mat-icon matListIcon>{{ item.icon }}</mat-icon>
+      <span class="nav-label">{{ item.label }}</span>
+    </a>
+  </mat-nav-list>
+
+  <div class="sidenav-footer">
+    <mat-divider></mat-divider>
+    <button mat-list-item (click)="onLogout()" class="logout-item">
+      <mat-icon matListIcon>logout</mat-icon>
+      <span class="nav-label">Sair</span>
+    </button>
+  </div>
+</nav>

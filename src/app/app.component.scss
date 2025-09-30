@@ -1,0 +1,37 @@
+.auth-layout {
+  height: 100vh;
+}
+
+.main-layout {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidenav-container {
+  height: calc(100vh - 64px);
+  margin-top: 64px;
+}
+
+.app-sidenav {
+  width: 280px;
+  border-right: none;
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.main-content {
+  background: #f5f5f5;
+  overflow-y: auto;
+}
+
+.content-wrapper {
+  min-height: calc(100vh - 64px);
+  padding: 0;
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .app-sidenav {
+    width: 250px;
+  }
+}
