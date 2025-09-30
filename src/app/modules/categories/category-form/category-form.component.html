@@ -1,0 +1,105 @@
+<div class="category-form-container">
+  <h2 mat-dialog-title>
+    <mat-icon>{{ isEdit ? 'edit' : 'add' }}</mat-icon>
+    {{ isEdit ? 'Editar Categoria' : 'Nova Categoria' }}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="categoryForm" class="category-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome</mat-label>
+          <input matInput formControlName="name" maxlength="50">
+          <mat-hint align="end">{{ categoryForm.get('name')?.value?.length || 0 }}/50</mat-hint>
+          <mat-error *ngIf="categoryForm.get('name')?.hasError('required')">
+            Nome é obrigatório
+          </mat-error>
+          <mat-error *ngIf="categoryForm.get('name')?.hasError('minlength')">
+            Nome deve ter pelo menos 2 caracteres
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Tipo</mat-label>
+          <mat-select formControlName="type">
+            <mat-option *ngFor="let type of transactionTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="categoryForm.get('type')?.hasError('required')">
+            Tipo é obrigatório
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Ícone</mat-label>
+          <mat-select formControlName="icon">
+            <mat-option *ngFor="let icon of availableIcons" [value]="icon">
+              <mat-icon>{{ icon }}</mat-icon>
+              {{ icon }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="categoryForm.get('icon')?.hasError('required')">
+            Ícone é obrigatório
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Cor</mat-label>
+          <mat-select formControlName="color">
+            <mat-option *ngFor="let color of availableColors" [value]="color">
+              <div class="color-option">
+                <div class="color-preview" [style.background]="color"></div>
+                <span>{{ color }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="categoryForm.get('color')?.hasError('required')">
+            Cor é obrigatória
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Limite de Orçamento (Opcional)</mat-label>
+          <input matInput type="number" formControlName="budgetLimit" min="0" step="0.01">
+          <span matPrefix>R$&nbsp;</span>
+          <mat-hint>Defina um limite mensal para gastos nesta categoria</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <!-- Preview da categoria -->
+      <div class="category-preview" *ngIf="categoryForm.valid">
+        <h4>Preview:</h4>
+        <div class="preview-card">
+          <mat-icon [style.color]="categoryForm.get('color')?.value">
+            {{ categoryForm.get('icon')?.value }}
+          </mat-icon>
+          <span class="preview-name">{{ categoryForm.get('name')?.value }}</span>
+          <span class="preview-type" [class]="categoryForm.get('type')?.value === 1 ? 'primary' : 'warn'">
+            {{ categoryForm.get('type')?.value === 1 ? 'Receita' : 'Despesa' }}
+          </span>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="loading">
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()"
+      [disabled]="categoryForm.invalid || loading">
+      <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+      <span *ngIf="!loading">{{ isEdit ? 'Atualizar' : 'Criar' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>

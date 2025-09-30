@@ -7,8 +7,16 @@
         <th mat-header-cell *matHeaderCellDef [style.width]="column.width">
           {{ column.header }}
         </th>
-        <td mat-cell *matCellDef="let element" [class]="column.type">
-          {{ formatValue(element[column.key], column) }}
+        <td mat-cell *matCellDef="let element">
+          <!-- Célula customizada -->
+          <ng-container *ngIf="hasCustomTemplate(column.key); else defaultCell">
+            <ng-container *ngTemplateOutlet="getCustomTemplate(column.key)!; context: { $implicit: element }"></ng-container>
+          </ng-container>
+          
+          <!-- Célula padrão -->
+          <ng-template #defaultCell>
+            {{ formatValue(element[column.key], column) }}
+          </ng-template>
         </td>
       </ng-container>
 
@@ -16,27 +24,35 @@
       <ng-container matColumnDef="actions" *ngIf="showActions">
         <th mat-header-cell *matHeaderCellDef class="actions-header">Ações</th>
         <td mat-cell *matCellDef="let element" class="actions-cell">
-          <button 
-            mat-icon-button 
-            color="primary" 
-            (click)="onView(element)"
-            matTooltip="Visualizar">
-            <mat-icon>visibility</mat-icon>
-          </button>
-          <button 
-            mat-icon-button 
-            color="accent" 
-            (click)="onEdit(element)"
-            matTooltip="Editar">
-            <mat-icon>edit</mat-icon>
-          </button>
-          <button 
-            mat-icon-button 
-            color="warn" 
-            (click)="onDelete(element)"
-            matTooltip="Excluir">
-            <mat-icon>delete</mat-icon>
-          </button>
+          <!-- Ações customizadas -->
+          <ng-container *ngIf="hasCustomTemplate('actions'); else defaultActions">
+            <ng-container *ngTemplateOutlet="getCustomTemplate('actions')!; context: { $implicit: element }"></ng-container>
+          </ng-container>
+          
+          <!-- Ações padrão -->
+          <ng-template #defaultActions>
+            <button 
+              mat-icon-button 
+              color="primary" 
+              (click)="onView(element)"
+              matTooltip="Visualizar">
+              <mat-icon>visibility</mat-icon>
+            </button>
+            <button 
+              mat-icon-button 
+              color="accent" 
+              (click)="onEdit(element)"
+              matTooltip="Editar">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button 
+              mat-icon-button 
+              color="warn" 
+              (click)="onDelete(element)"
+              matTooltip="Excluir">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </ng-template>
         </td>
       </ng-container>
 

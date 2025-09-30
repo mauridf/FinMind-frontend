@@ -10,6 +10,15 @@
 
   <span class="spacer"></span>
 
+  <!-- Toggle de Tema -->
+  <button 
+    mat-icon-button 
+    (click)="onToggleTheme()"
+    [matTooltip]="getThemeTooltip()"
+    class="theme-toggle">
+    <mat-icon>{{ getThemeIcon() }}</mat-icon>
+  </button>
+
   <div class="user-menu-container">
     <button 
       mat-icon-button 

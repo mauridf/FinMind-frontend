@@ -1,0 +1,104 @@
+<div class="categories-container">
+  <div class="categories-header">
+    <h1>Categorias</h1>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onAddCategory()">
+      <mat-icon>add</mat-icon>
+      Nova Categoria
+    </button>
+  </div>
+
+  <mat-card class="categories-card">
+    <mat-card-content>
+      <mat-tab-group [(selectedIndex)]="selectedTab">
+        <!-- Minhas Categorias -->
+        <mat-tab label="Minhas Categorias">
+          <app-data-table
+            [data]="categories"
+            [columns]="columns"
+            [totalItems]="categories.length"
+            [pageSize]="10"
+            [loading]="loading"
+            [showActions]="true"
+            (edit)="onEditCategory($event)"
+            (delete)="onDeleteCategory($event)"
+            (view)="onViewCategory($event)">
+            
+            <!-- Template customizado para ícone -->
+            <ng-container *appDataTableCustomCell="let item; column: 'icon'">
+              <mat-icon [style.color]="item.color">{{ item.icon }}</mat-icon>
+            </ng-container>
+
+            <!-- Template customizado para tipo -->
+            <ng-container *appDataTableCustomCell="let item; column: 'type'">
+              <span [class]="getTransactionTypeColor(item.type)">
+                {{ getTransactionTypeLabel(item.type) }}
+              </span>
+            </ng-container>
+
+            <!-- Template customizado para cor -->
+            <ng-container *appDataTableCustomCell="let item; column: 'color'">
+              <div class="color-preview" [style.background]="item.color"></div>
+            </ng-container>
+
+            <!-- Template customizado para ações -->
+            <ng-container *appDataTableCustomCell="let item; column: 'actions'">
+              <button 
+                mat-icon-button 
+                color="primary" 
+                (click)="onViewCategory(item)"
+                matTooltip="Visualizar">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button 
+                *ngIf="canEditCategory(item)"
+                mat-icon-button 
+                color="accent" 
+                (click)="onEditCategory(item)"
+                matTooltip="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button 
+                *ngIf="canDeleteCategory(item)"
+                mat-icon-button 
+                color="warn" 
+                (click)="onDeleteCategory(item)"
+                matTooltip="Excluir">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ng-container>
+          </app-data-table>
+        </mat-tab>
+
+        <!-- Categorias Padrão -->
+        <mat-tab label="Categorias Padrão">
+          <app-data-table
+            [data]="defaultCategories"
+            [columns]="columns"
+            [totalItems]="defaultCategories.length"
+            [pageSize]="10"
+            [loading]="false"
+            [showActions]="false">
+            
+            <!-- Templates customizados (mesmo do tab anterior) -->
+            <ng-container *appDataTableCustomCell="let item; column: 'icon'">
+              <mat-icon [style.color]="item.color">{{ item.icon }}</mat-icon>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'type'">
+              <span [class]="getTransactionTypeColor(item.type)">
+                {{ getTransactionTypeLabel(item.type) }}
+              </span>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'color'">
+              <div class="color-preview" [style.background]="item.color"></div>
+            </ng-container>
+          </app-data-table>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div>

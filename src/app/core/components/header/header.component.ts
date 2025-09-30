@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { AuthService } from '../../services/auth.service';
+import { ThemeService } from '../../services/theme.service';
 import { User } from '../../models/user.model';
 
 @Component({
@@ -18,6 +19,7 @@ export class HeaderComponent {
 
   constructor(
     private authService: AuthService,
+    private themeService: ThemeService,
     private router: Router,
     private snackBar: MatSnackBar
   ) {
@@ -53,5 +55,17 @@ export class HeaderComponent {
       duration: 5000,
       panelClass: ['error-snackbar']
     });
+  }
+
+  onToggleTheme(): void {
+    this.themeService.toggleTheme();
+  }
+
+  getThemeIcon(): string {
+    return this.themeService.getCurrentTheme() === 'light' ? 'dark_mode' : 'light_mode';
+  }
+
+  getThemeTooltip(): string {
+    return this.themeService.getCurrentTheme() === 'light' ? 'Modo Escuro' : 'Modo Claro';
   }
 }

@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, ContentChildren, QueryList, TemplateRef } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
+import { DataTableCustomCellDirective } from './data-table-custom-cell.directive';
 
 export interface ColumnDefinition {
   key: string;
@@ -28,6 +29,8 @@ export class DataTableComponent implements OnInit {
   @Output() edit = new EventEmitter<any>();
   @Output() delete = new EventEmitter<any>();
   @Output() view = new EventEmitter<any>();
+
+  @ContentChildren(DataTableCustomCellDirective) customCells!: QueryList<DataTableCustomCellDirective>;
 
   displayedColumns: string[] = [];
 
@@ -76,5 +79,14 @@ export class DataTableComponent implements OnInit {
       default:
         return value.toString();
     }
+  }
+
+  getCustomTemplate(columnKey: string): TemplateRef<any> | null {
+    const customCell = this.customCells.find(cell => cell.column === columnKey);
+    return customCell ? customCell.templateRef : null;
+  }
+
+  hasCustomTemplate(columnKey: string): boolean {
+    return this.customCells.some(cell => cell.column === columnKey);
   }
 }

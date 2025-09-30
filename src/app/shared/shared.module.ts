@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 
 // Components
 import { DataTableComponent } from './components/data-table/data-table.component';
+import { DataTableCustomCellDirective } from './components/data-table/data-table-custom-cell.directive';
 
 // Angular Material
 import { MatTableModule } from '@angular/material/table';
@@ -15,7 +16,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
-    DataTableComponent
+    DataTableComponent,
+    DataTableCustomCellDirective
   ],
   imports: [
     CommonModule,
@@ -28,7 +30,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatProgressSpinnerModule
   ],
   exports: [
-    DataTableComponent
+    DataTableComponent,
+    DataTableCustomCellDirective
   ]
 })
 export class SharedModule { }
