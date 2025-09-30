@@ -30,6 +30,7 @@ import { ApiService } from './core/services/api.service';
 import { TransactionService } from './core/services/transaction.service';
 import { CategoryService } from './core/services/category.service';
 import { ThemeService } from './core/services/theme.service';
+import { BudgetService } from './core/services/budget.service';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { AuthGuard } from './core/guards/auth.guard';
 
@@ -65,6 +66,7 @@ import { AuthGuard } from './core/guards/auth.guard';
     TransactionService,
     CategoryService,
     ThemeService,
+    BudgetService,
     AuthGuard,
     {
       provide: HTTP_INTERCEPTORS,

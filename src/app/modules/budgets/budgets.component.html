@@ -1,0 +1,246 @@
+<div class="budgets-container">
+  <!-- Header -->
+  <div class="budgets-header">
+    <div class="header-content">
+      <h1>Orçamentos</h1>
+      <p>Controle seus limites de gastos por categoria</p>
+    </div>
+    <div class="header-actions">
+      <button 
+        mat-stroked-button 
+        color="primary" 
+        (click)="refreshData()"
+        class="refresh-button">
+        <mat-icon>refresh</mat-icon>
+        Atualizar
+      </button>
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="onAddBudget()">
+        <mat-icon>add</mat-icon>
+        Novo Orçamento
+      </button>
+    </div>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <mat-card class="budgets-card">
+    <mat-card-content>
+      <mat-tab-group [(selectedIndex)]="selectedTab">
+        <!-- Todos os Orçamentos -->
+        <mat-tab label="Todos os Orçamentos">
+          <app-data-table
+            [data]="budgets"
+            [columns]="columns"
+            [totalItems]="budgets.length"
+            [pageSize]="10"
+            [loading]="loading"
+            [showActions]="true"
+            (edit)="onEditBudget($event)"
+            (delete)="onDeleteBudget($event)"
+            (view)="onViewBudget($event)">
+            
+            <!-- Template customizado para uso -->
+            <ng-container *appDataTableCustomCell="let item; column: 'usage'">
+              <div *ngIf="item.usagePercentage !== undefined" class="usage-container">
+                <div class="usage-info">
+                  <span class="usage-amount">
+                    {{ formatCurrency(item.currentSpending || 0) }} / {{ formatCurrency(item.amount) }}
+                  </span>
+                  <span class="usage-percentage">
+                    {{ formatPercentage(item.usagePercentage) }}
+                  </span>
+                </div>
+                <mat-progress-bar 
+                  [value]="item.usagePercentage" 
+                  [color]="getUsageColor(item.usagePercentage)"
+                  mode="determinate"
+                  class="usage-progress">
+                </mat-progress-bar>
+              </div>
+              <div *ngIf="item.usagePercentage === undefined" class="no-usage">
+                <span>Dados de uso indisponíveis</span>
+              </div>
+            </ng-container>
+
+            <!-- Template customizado para status -->
+            <ng-container *appDataTableCustomCell="let item; column: 'status'">
+              <mat-chip 
+                [color]="getStatusColor(item)" 
+                selected
+                class="status-chip">
+                {{ getStatusText(item) }}
+              </mat-chip>
+            </ng-container>
+
+            <!-- Template customizado para período -->
+            <ng-container *appDataTableCustomCell="let item; column: 'period'">
+              {{ getPeriodLabel(item.period) }}
+            </ng-container>
+
+            <!-- Template customizado para datas -->
+            <ng-container *appDataTableCustomCell="let item; column: 'dateRange'">
+              {{ formatDateRange(item.startDate, item.endDate) }}
+            </ng-container>
+
+            <!-- Template customizado para ações -->
+            <ng-container *appDataTableCustomCell="let item; column: 'actions'">
+              <button 
+                mat-icon-button 
+                color="primary" 
+                (click)="onViewBudget(item)"
+                matTooltip="Visualizar">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="accent" 
+                (click)="onEditBudget(item)"
+                matTooltip="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="onDeleteBudget(item)"
+                matTooltip="Excluir">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ng-container>
+          </app-data-table>
+        </mat-tab>
+
+        <!-- Orçamentos Ativos -->
+        <mat-tab label="Orçamentos Ativos">
+          <app-data-table
+            [data]="activeBudgets"
+            [columns]="columns"
+            [totalItems]="activeBudgets.length"
+            [pageSize]="10"
+            [loading]="loading"
+            [showActions]="true"
+            (edit)="onEditBudget($event)"
+            (delete)="onDeleteBudget($event)"
+            (view)="onViewBudget($event)">
+            
+            <!-- Mesmos templates customizados da aba anterior -->
+            <ng-container *appDataTableCustomCell="let item; column: 'usage'">
+              <div *ngIf="item.usagePercentage !== undefined" class="usage-container">
+                <div class="usage-info">
+                  <span class="usage-amount">
+                    {{ formatCurrency(item.currentSpending || 0) }} / {{ formatCurrency(item.amount) }}
+                  </span>
+                  <span class="usage-percentage">
+                    {{ formatPercentage(item.usagePercentage) }}
+                  </span>
+                </div>
+                <mat-progress-bar 
+                  [value]="item.usagePercentage" 
+                  [color]="getUsageColor(item.usagePercentage)"
+                  mode="determinate"
+                  class="usage-progress">
+                </mat-progress-bar>
+              </div>
+              <div *ngIf="item.usagePercentage === undefined" class="no-usage">
+                <span>Dados de uso indisponíveis</span>
+              </div>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'status'">
+              <mat-chip 
+                [color]="getStatusColor(item)" 
+                selected
+                class="status-chip">
+                {{ getStatusText(item) }}
+              </mat-chip>
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'period'">
+              {{ getPeriodLabel(item.period) }}
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'dateRange'">
+              {{ formatDateRange(item.startDate, item.endDate) }}
+            </ng-container>
+
+            <ng-container *appDataTableCustomCell="let item; column: 'actions'">
+              <button 
+                mat-icon-button 
+                color="primary" 
+                (click)="onViewBudget(item)"
+                matTooltip="Visualizar">
+                <mat-icon>visibility</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="accent" 
+                (click)="onEditBudget(item)"
+                matTooltip="Editar">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button 
+                mat-icon-button 
+                color="warn" 
+                (click)="onDeleteBudget(item)"
+                matTooltip="Excluir">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </ng-container>
+          </app-data-table>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Estatísticas Rápidas -->
+  <div class="stats-grid" *ngIf="!loading && budgets.length > 0">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">savings</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ budgets.length }}</span>
+            <span class="stat-label">Total de Orçamentos</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">active</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ activeBudgets.length }}</span>
+            <span class="stat-label">Orçamentos Ativos</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">warning</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ nearLimitCount }}</span>
+            <span class="stat-label">Próximos do Limite</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">money_off</mat-icon>
+          <div class="stat-info">
+            <span class="stat-value">{{ exceededCount }}</span>
+            <span class="stat-label">Orçamentos Estourados</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

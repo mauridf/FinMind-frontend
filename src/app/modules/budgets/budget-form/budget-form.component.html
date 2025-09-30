@@ -1,0 +1,160 @@
+<div class="budget-form-container">
+  <h2 mat-dialog-title>
+    <mat-icon>{{ isEdit ? 'edit' : 'add' }}</mat-icon>
+    {{ isEdit ? 'Editar Orçamento' : 'Novo Orçamento' }}
+  </h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="budgetForm" class="budget-form">
+      <!-- Categoria -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Categoria</mat-label>
+          <mat-select formControlName="categoryId" [disabled]="isEdit">
+            <mat-option *ngFor="let category of expenseCategories" [value]="category.id">
+              <div class="category-option">
+                <mat-icon [style.color]="category.color">{{ category.icon }}</mat-icon>
+                <span>{{ category.name }}</span>
+              </div>
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="budgetForm.get('categoryId')?.hasError('required')">
+            Categoria é obrigatória
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Valor e Período -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Valor do Orçamento</mat-label>
+          <input 
+            matInput 
+            type="number" 
+            formControlName="amount" 
+            min="0.01" 
+            step="0.01">
+          <span matPrefix>R$&nbsp;</span>
+          <mat-error *ngIf="budgetForm.get('amount')?.hasError('required')">
+            Valor é obrigatório
+          </mat-error>
+          <mat-error *ngIf="budgetForm.get('amount')?.hasError('min')">
+            Valor deve ser maior que zero
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Período</mat-label>
+          <mat-select formControlName="period">
+            <mat-option *ngFor="let period of budgetPeriods" [value]="period.value">
+              {{ period.label }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="budgetForm.get('period')?.hasError('required')">
+            Período é obrigatório
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <!-- Datas -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Data Inicial</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+          <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+          <mat-error *ngIf="budgetForm.get('startDate')?.hasError('required')">
+            Data inicial é obrigatória
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="half-width" *ngIf="!isEdit">
+          <mat-label>Data Final (Calculada)</mat-label>
+          <input matInput [value]="getCalculatedEndDate() | date:'dd/MM/yyyy'" readonly>
+          <mat-icon matSuffix>event</mat-icon>
+          <mat-hint>Calculada automaticamente</mat-hint>
+        </mat-form-field>
+      </div>
+
+      <!-- Alertas -->
+      <div class="alerts-section">
+        <h3>Configurações de Alerta</h3>
+        
+        <div class="form-row">
+          <mat-checkbox formControlName="alertsEnabled" class="full-width">
+            Ativar alertas para este orçamento
+          </mat-checkbox>
+        </div>
+
+        <div class="form-row" *ngIf="budgetForm.get('alertsEnabled')?.value">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Limite para Alerta</mat-label>
+            <input 
+              matInput 
+              type="number" 
+              formControlName="alertThreshold" 
+              min="1" 
+              max="100"
+              step="1">
+            <span matSuffix>%</span>
+            <mat-hint>Receba um alerta quando o uso atingir esta porcentagem</mat-hint>
+            <mat-error *ngIf="budgetForm.get('alertThreshold')?.hasError('min')">
+              Mínimo 1%
+            </mat-error>
+            <mat-error *ngIf="budgetForm.get('alertThreshold')?.hasError('max')">
+              Máximo 100%
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <!-- Resumo -->
+      <div class="summary-section" *ngIf="budgetForm.valid">
+        <h3>Resumo do Orçamento</h3>
+        <div class="summary-card">
+          <div class="summary-item">
+            <span class="label">Categoria:</span>
+            <span class="value">{{ getCategoryName(budgetForm.get('categoryId')?.value) }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Valor:</span>
+            <span class="value">{{ budgetForm.get('amount')?.value | currency:'BRL' }}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Período:</span>
+            <span class="value">
+              {{ getPeriodDescription(budgetForm.get('period')?.value) }}
+            </span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Vigência:</span>
+            <span class="value">
+              {{ budgetForm.get('startDate')?.value | date:'dd/MM/yyyy' }} 
+              até {{ getCalculatedEndDate() | date:'dd/MM/yyyy' }}
+            </span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Alertas:</span>
+            <span class="value">
+              {{ budgetForm.get('alertsEnabled')?.value ? 'Ativados em ' + budgetForm.get('alertThreshold')?.value + '%' : 'Desativados' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onCancel()" [disabled]="loading">
+      Cancelar
+    </button>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="onSubmit()"
+      [disabled]="budgetForm.invalid || loading">
+      <mat-spinner diameter="20" *ngIf="loading"></mat-spinner>
+      <span *ngIf="!loading">{{ isEdit ? 'Atualizar' : 'Criar' }}</span>
+    </button>
+  </mat-dialog-actions>
+</div>
