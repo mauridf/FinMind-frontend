@@ -25,6 +25,7 @@ import { SidenavComponent } from './core/components/sidenav/sidenav.component';
 // Services and Interceptors
 import { AuthService } from './core/services/auth.service';
 import { UserService } from './core/services/user.service';
+import { DashboardService } from './core/services/dashboard.service';
 import { ApiService } from './core/services/api.service';
 import { TransactionService } from './core/services/transaction.service';
 import { CategoryService } from './core/services/category.service';
@@ -59,6 +60,7 @@ import { AuthGuard } from './core/guards/auth.guard';
   providers: [
     AuthService,
     UserService,
+    DashboardService,
     ApiService,
     TransactionService,
     CategoryService,

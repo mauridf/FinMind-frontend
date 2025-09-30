@@ -1,30 +1,426 @@
 <div class="dashboard-container">
-  <div class="welcome-section">
-    <h1 class="welcome-title">Bem-vindo ao FinMind</h1>
-    <p class="welcome-subtitle">Sistema Inteligente de Gestão Financeira Pessoal</p>
-    
-    <mat-card class="dashboard-card">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="header-content">
+      <h1 class="welcome-title">Dashboard Financeiro</h1>
+      <p class="welcome-subtitle">Visão completa da sua saúde financeira</p>
+    </div>
+    <button 
+      mat-raised-button 
+      color="primary" 
+      (click)="refreshData()"
+      class="refresh-button">
+      <mat-icon>refresh</mat-icon>
+      Atualizar
+    </button>
+  </div>
+
+  <!-- Resumo Principal -->
+  <div class="summary-cards-grid">
+    <!-- Saldo Total -->
+    <mat-card class="summary-card balance-card" *ngIf="!loading.summary && summary">
+      <mat-card-content>
+        <div class="card-header">
+          <mat-icon class="card-icon">account_balance</mat-icon>
+          <h3>Saldo Total</h3>
+        </div>
+        <div class="card-value" [class.positive]="summary.totalBalance >= 0" 
+                              [class.negative]="summary.totalBalance < 0">
+          {{ formatCurrency(summary.totalBalance) }}
+        </div>
+        <div class="card-trend">
+          <mat-icon *ngIf="summary.totalBalance >= 0" class="trend-up">trending_up</mat-icon>
+          <mat-icon *ngIf="summary.totalBalance < 0" class="trend-down">trending_down</mat-icon>
+          <span>Saldo atual</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Receitas -->
+    <mat-card class="summary-card income-card" *ngIf="!loading.summary && summary">
+      <mat-card-content>
+        <div class="card-header">
+          <mat-icon class="card-icon">trending_up</mat-icon>
+          <h3>Receitas</h3>
+        </div>
+        <div class="card-value positive">
+          {{ formatCurrency(summary.totalIncome) }}
+        </div>
+        <div class="card-trend">
+          <mat-icon class="trend-up">arrow_upward</mat-icon>
+          <span>Entradas totais</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Despesas -->
+    <mat-card class="summary-card expense-card" *ngIf="!loading.summary && summary">
+      <mat-card-content>
+        <div class="card-header">
+          <mat-icon class="card-icon">trending_down</mat-icon>
+          <h3>Despesas</h3>
+        </div>
+        <div class="card-value negative">
+          {{ formatCurrency(summary.totalExpenses) }}
+        </div>
+        <div class="card-trend">
+          <mat-icon class="trend-down">arrow_downward</mat-icon>
+          <span>Saídas totais</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Transações -->
+    <mat-card class="summary-card transactions-card" *ngIf="!loading.summary && summary">
+      <mat-card-content>
+        <div class="card-header">
+          <mat-icon class="card-icon">receipt</mat-icon>
+          <h3>Transações</h3>
+        </div>
+        <div class="card-value">
+          {{ summary.totalTransactions }}
+        </div>
+        <div class="card-trend">
+          <mat-icon class="trend-neutral">list_alt</mat-icon>
+          <span>Total registrado</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Loading para resumo -->
+    <mat-card *ngIf="loading.summary" class="summary-card loading-card">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Carregando dados...</p>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Grid Principal -->
+  <div class="main-grid">
+    <!-- Coluna Esquerda -->
+    <div class="left-column">
+      <!-- Gastos por Categoria -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>pie_chart</mat-icon>
+            Gastos por Categoria
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="loading.spending" class="loading-content">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Carregando categorias...</p>
+          </div>
+          
+          <div *ngIf="!loading.spending && spendingByCategory.length === 0" class="empty-state">
+            <mat-icon>pie_chart</mat-icon>
+            <p>Nenhum gasto por categoria encontrado</p>
+            <small>As categorias aparecerão aqui quando você tiver transações</small>
+          </div>
+
+          <div *ngIf="!loading.spending && spendingByCategory.length > 0" class="categories-list">
+            <div *ngFor="let item of spendingByCategory" class="category-item">
+              <div class="category-info">
+                <mat-icon [style.color]="item.color">{{ item.icon }}</mat-icon>
+                <span class="category-name">{{ item.category }}</span>
+                <span class="category-percentage">{{ formatPercentage(item.percentage) }}</span>
+              </div>
+              <div class="category-amount">
+                {{ formatCurrency(item.amount) }}
+              </div>
+              <mat-progress-bar 
+                [value]="item.percentage" 
+                [color]="getProgressColor(item.percentage)"
+                mode="determinate"
+                class="category-progress">
+              </mat-progress-bar>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Status de Orçamentos -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>savings</mat-icon>
+            Status dos Orçamentos
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="loading.budget" class="loading-content">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Carregando orçamentos...</p>
+          </div>
+          
+          <div *ngIf="!loading.budget && budgetStatus.length === 0" class="empty-state">
+            <mat-icon>savings</mat-icon>
+            <p>Nenhum orçamento configurado</p>
+            <small>Configure orçamentos nas categorias para acompanhar aqui</small>
+          </div>
+
+          <div *ngIf="!loading.budget && budgetStatus.length > 0" class="budgets-list">
+            <div *ngFor="let budget of budgetStatus" class="budget-item">
+              <div class="budget-header">
+                <span class="budget-category">{{ budget.category }}</span>
+                <mat-chip 
+                  [color]="budget.isOverBudget ? 'warn' : 'primary'" 
+                  selected
+                  class="budget-chip">
+                  {{ formatPercentage(budget.usagePercentage) }}
+                </mat-chip>
+              </div>
+              <div class="budget-amounts">
+                <span>Gasto: {{ formatCurrency(budget.spentAmount) }}</span>
+                <span>Limite: {{ formatCurrency(budget.budgetAmount) }}</span>
+                <span>Restante: {{ formatCurrency(budget.remainingAmount) }}</span>
+              </div>
+              <mat-progress-bar 
+                [value]="budget.usagePercentage" 
+                [color]="budget.isOverBudget ? 'warn' : 'primary'"
+                mode="determinate"
+                class="budget-progress">
+              </mat-progress-bar>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Coluna Direita -->
+    <div class="right-column">
+      <!-- Saúde Financeira -->
+      <mat-card class="chart-card health-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>favorite</mat-icon>
+            Saúde Financeira
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="loading.health" class="loading-content">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Analisando saúde financeira...</p>
+          </div>
+          
+          <div *ngIf="!loading.health && financialHealth" class="health-content">
+            <div class="health-score">
+              <div class="score-circle" [class]="getHealthScoreColor(financialHealth.overallScore)">
+                <span class="score-value">{{ financialHealth.overallScore }}</span>
+                <span class="score-label">pontos</span>
+              </div>
+              <div class="score-info">
+                <h3>{{ getHealthScoreLabel(financialHealth.overallScore) }}</h3>
+                <p>Sua saúde financeira está {{ getHealthScoreLabel(financialHealth.overallScore).toLowerCase() }}</p>
+              </div>
+            </div>
+            
+            <div class="health-metrics">
+              <div class="metric">
+                <span class="metric-label">Taxa de Poupança</span>
+                <span class="metric-value">{{ formatPercentage(financialHealth.savingsRate) }}</span>
+              </div>
+              <div class="metric">
+                <span class="metric-label">Fundo de Emergência</span>
+                <span class="metric-value">{{ formatCurrency(financialHealth.emergencyFund) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!loading.health && !financialHealth" class="empty-state">
+            <mat-icon>favorite</mat-icon>
+            <p>Análise de saúde financeira indisponível</p>
+            <small>Complete mais dados para obter uma análise</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Progresso de Metas -->
+      <mat-card class="chart-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>flag</mat-icon>
+            Progresso de Metas
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="loading.goals" class="loading-content">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Carregando metas...</p>
+          </div>
+          
+          <div *ngIf="!loading.goals && goalsProgress.length === 0" class="empty-state">
+            <mat-icon>flag</mat-icon>
+            <p>Nenhuma meta em andamento</p>
+            <small>Configure metas financeiras para acompanhar aqui</small>
+          </div>
+
+          <div *ngIf="!loading.goals && goalsProgress.length > 0" class="goals-list">
+            <div *ngFor="let goal of goalsProgress" class="goal-item">
+              <div class="goal-info">
+                <h4>{{ goal.goalName }}</h4>
+                <div class="goal-amounts">
+                  <span>{{ formatCurrency(goal.currentAmount) }} de {{ formatCurrency(goal.targetAmount) }}</span>
+                </div>
+              </div>
+              <div class="goal-progress">
+                <mat-progress-bar 
+                  [value]="goal.progressPercentage" 
+                  color="primary"
+                  mode="determinate"
+                  class="goal-bar">
+                </mat-progress-bar>
+                <span class="progress-text">{{ formatPercentage(goal.progressPercentage) }}</span>
+              </div>
+              <div class="goal-details">
+                <span class="days-remaining" [class.warning]="goal.daysRemaining < 30">
+                  {{ goal.daysRemaining }} dias restantes
+                </span>
+                <mat-icon 
+                  *ngIf="goal.isOnTrack" 
+                  class="on-track"
+                  matTooltip="Meta no caminho certo">
+                  check_circle
+                </mat-icon>
+              </div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <!-- Estatísticas Rápidas -->
+      <mat-card class="chart-card stats-card">
+        <mat-card-header>
+          <mat-card-title>
+            <mat-icon>insights</mat-icon>
+            Estatísticas Rápidas
+          </mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div *ngIf="loading.stats" class="loading-content">
+            <mat-spinner diameter="40"></mat-spinner>
+            <p>Carregando estatísticas...</p>
+          </div>
+          
+          <div *ngIf="!loading.stats && quickStats" class="stats-grid">
+            <div class="stat-item">
+              <mat-icon>avg_time</mat-icon>
+              <div class="stat-info">
+                <span class="stat-value">{{ formatCurrency(quickStats.averageMonthlySpending) }}</span>
+                <span class="stat-label">Gasto Mensal Médio</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <mat-icon>money_off</mat-icon>
+              <div class="stat-info">
+                <span class="stat-value">{{ formatCurrency(quickStats.largestExpense) }}</span>
+                <span class="stat-label">Maior Despesa</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <mat-icon>category</mat-icon>
+              <div class="stat-info">
+                <span class="stat-value">{{ quickStats.mostUsedCategory }}</span>
+                <span class="stat-label">Categoria Mais Usada</span>
+              </div>
+            </div>
+            <div class="stat-item">
+              <mat-icon>receipt_long</mat-icon>
+              <div class="stat-info">
+                <span class="stat-value">{{ quickStats.transactionsThisMonth }}</span>
+                <span class="stat-label">Transações Este Mês</span>
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="!loading.stats && !quickStats" class="empty-state">
+            <mat-icon>insights</mat-icon>
+            <p>Estatísticas indisponíveis</p>
+            <small>Complete mais transações para ver estatísticas</small>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Grid Inferior -->
+  <div class="bottom-grid">
+    <!-- Projeção de Fluxo de Caixa -->
+    <mat-card class="wide-card">
       <mat-card-header>
         <mat-card-title>
-          <mat-icon class="card-icon">dashboard</mat-icon>
-          Dashboard
+          <mat-icon>timeline</mat-icon>
+          Projeção de Fluxo de Caixa (30 dias)
         </mat-card-title>
-        <mat-card-subtitle>Resumo financeiro do sistema</mat-card-subtitle>
       </mat-card-header>
-      
       <mat-card-content>
-        <p>Esta é a tela principal do sistema FinMind.</p>
-        <p>Em breve você terá aqui:</p>
-        <ul>
-          <li>Resumo financeiro completo</li>
-          <li>Gráficos de gastos por categoria</li>
-          <li>Metas e orçamentos</li>
-          <li>Transações recentes</li>
-        </ul>
+        <div *ngIf="loading.cashFlow" class="loading-content">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Calculando projeção...</p>
+        </div>
         
-        <div class="coming-soon">
-          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-          <p class="coming-soon-text">Funcionalidades em desenvolvimento...</p>
+        <div *ngIf="!loading.cashFlow && cashFlowProjection.length === 0" class="empty-state">
+          <mat-icon>timeline</mat-icon>
+          <p>Projeção de fluxo indisponível</p>
+          <small>Dados insuficientes para projeção</small>
+        </div>
+
+        <div *ngIf="!loading.cashFlow && cashFlowProjection.length > 0" class="cash-flow-list">
+          <div *ngFor="let projection of cashFlowProjection.slice(0, 7)" class="projection-item">
+            <div class="projection-date">
+              {{ projection.date | date:'dd/MM' }}
+            </div>
+            <div class="projection-amounts">
+              <span class="income">+{{ formatCurrency(projection.expectedIncome) }}</span>
+              <span class="expense">-{{ formatCurrency(projection.expectedExpenses) }}</span>
+              <span class="balance" [class.positive]="projection.projectedBalance >= 0" 
+                                 [class.negative]="projection.projectedBalance < 0">
+                {{ formatCurrency(projection.projectedBalance) }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Resumo Mensal -->
+    <mat-card class="wide-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>calendar_today</mat-icon>
+          Resumo dos Últimos 6 Meses
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div *ngIf="loading.monthly" class="loading-content">
+          <mat-spinner diameter="40"></mat-spinner>
+          <p>Carregando histórico...</p>
+        </div>
+        
+        <div *ngIf="!loading.monthly && monthlySummary.length === 0" class="empty-state">
+          <mat-icon>calendar_today</mat-icon>
+          <p>Histórico mensal indisponível</p>
+          <small>Complete dados para ver o histórico</small>
+        </div>
+
+        <div *ngIf="!loading.monthly && monthlySummary.length > 0" class="monthly-summary">
+          <div *ngFor="let month of monthlySummary" class="month-item">
+            <div class="month-header">
+              <span class="month-name">{{ getMonthName(month.month) }}/{{ month.year }}</span>
+              <span class="month-balance" [class.positive]="month.balance >= 0" 
+                                       [class.negative]="month.balance < 0">
+                {{ formatCurrency(month.balance) }}
+              </span>
+            </div>
+            <div class="month-details">
+              <span class="month-income">+{{ formatCurrency(month.income) }}</span>
+              <span class="month-expense">-{{ formatCurrency(month.expenses) }}</span>
+            </div>
+          </div>
         </div>
       </mat-card-content>
     </mat-card>
